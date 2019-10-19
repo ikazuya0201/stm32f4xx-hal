@@ -68,6 +68,8 @@ macro_rules! hal_advanced {
                 let rcc = unsafe { &(*RCC::ptr()) };
                 rcc.ahb1enr.write(|w| w.gpioaen().set_bit());
 
+                tim.cr1.write(|w| w.cen().clear_bit());
+
                 if PINS::C1 {
                     tim.ccmr1_output().write(|w| w.oc1pe().set_bit().oc1m().pwm_mode1());
                 }
@@ -90,10 +92,13 @@ macro_rules! hal_advanced {
                 let arr = u16(ticks / u32(psc+1)).unwrap() - 1;
                 tim.arr.write(|w| w.arr().bits(arr));
 
-                tim.cr1.write(|w| w.arpe().set_bit().cen().set_bit());
                 tim.egr.write(|w| w.ug().set_bit());
+                tim.cr1.write(|w| w.arpe().set_bit());
+
                 tim.bdtr.write(|w| w.ossr().clear_bit());
                 tim.bdtr.write(|w| w.moe().set_bit());
+
+                tim.cr1.write(|w| w.cen().set_bit());
 
                 unsafe{ mem::uninitialized() }
             }
