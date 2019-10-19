@@ -72,18 +72,22 @@ macro_rules! hal_advanced {
 
                 if PINS::C1 {
                     tim.ccmr1_output().write(|w| w.oc1pe().set_bit().oc1m().pwm_mode1());
+                    tim.ccr1.write(|w| w.ccr().bits(0));
                 }
 
                 if PINS::C2 {
                     tim.ccmr1_output().write(|w| w.oc2pe().set_bit().oc2m().pwm_mode1());
+                    tim.ccr2.write(|w| w.ccr().bits(0));
                 }
 
                 if PINS::C3 {
                     tim.ccmr2_output().write(|w| w.oc3pe().set_bit().oc3m().pwm_mode1());
+                    tim.ccr3.write(|w| w.ccr().bits(0));
                 }
 
                 if PINS::C4 {
                     tim.ccmr2_output().write(|w| w.oc4pe().set_bit().oc4m().pwm_mode1());
+                    tim.ccr4.write(|w| w.ccr().bits(0));
                 }
 
                 let ticks = clk.0 / freq.0;
@@ -111,7 +115,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn enable(&mut self) {
-                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc1e().set_bit());
+                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc1e().set_bit().cc1ne().clear_bit());
                 }
 
                 fn get_duty(&self) -> Self::Duty {
@@ -135,7 +139,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn enable(&mut self) {
-                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc2e().set_bit());
+                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc2e().set_bit().cc2ne().clear_bit());
                 }
 
                 fn get_duty(&self) -> Self::Duty {
@@ -159,7 +163,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn enable(&mut self) {
-                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc3e().set_bit());
+                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc3e().set_bit().cc3ne().clear_bit());
                 }
 
                 fn get_duty(&self) -> Self::Duty {
