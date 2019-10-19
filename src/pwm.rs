@@ -128,15 +128,12 @@ macro_rules! hal_advanced {
 
                 fn set_duty(&mut self, duty: Self::Duty) {
                     let tim = unsafe {&(*$TIMX::ptr())};
-                    self.disable();
-                    tim.cr1.write(|w| w.arpe().clear_bit());
-                    tim.ccmr1_output()
-                        .write(|w| w.oc1pe().clear_bit().oc1m().bits(0));
+                    tim.ccer.write(|w| w.cc1e().clear_bit());
+                    tim.ccmr1_output().write(|w| w.oc1m().pwm_mode1());
                     tim.ccr1.write(|w| w.ccr().bits(duty));
-                    tim.ccmr1_output()
-                        .write(|w| w.oc1pe().set_bit().oc1m().pwm_mode1());
-                    tim.cr1.write(|w| w.arpe().set_bit());
-                    self.enable();
+                    tim.ccmr1_output().write(|w| w.oc1pe().set_bit());
+                    tim.ccer.write(|w| w.cc1e().set_bit());
+                    tim.bdtr.write(|w| w.moe().set_bit());
                 }
             }
 
@@ -161,15 +158,12 @@ macro_rules! hal_advanced {
 
                 fn set_duty(&mut self, duty: Self::Duty) {
                     let tim = unsafe {&(*$TIMX::ptr())};
-                    self.disable();
-                    tim.cr1.write(|w| w.arpe().clear_bit());
-                    tim.ccmr1_output()
-                        .write(|w| w.oc2pe().clear_bit().oc2m().bits(0));
+                    tim.ccer.write(|w| w.cc2e().clear_bit());
+                    tim.ccmr1_output().write(|w| w.oc2m().pwm_mode1());
                     tim.ccr2.write(|w| w.ccr().bits(duty));
-                    tim.ccmr1_output()
-                        .write(|w| w.oc2pe().set_bit().oc2m().pwm_mode1());
-                    tim.cr1.write(|w| w.arpe().set_bit());
-                    self.enable();
+                    tim.ccmr1_output().write(|w| w.oc2pe().set_bit());
+                    tim.ccer.write(|w| w.cc2e().set_bit());
+                    tim.bdtr.write(|w| w.moe().set_bit());
                 }
             }
 
@@ -194,15 +188,12 @@ macro_rules! hal_advanced {
 
                 fn set_duty(&mut self, duty: Self::Duty) {
                     let tim = unsafe {&(*$TIMX::ptr())};
-                    self.disable();
-                    tim.cr1.write(|w| w.arpe().clear_bit());
-                    tim.ccmr2_output()
-                        .write(|w| w.oc3pe().clear_bit().oc3m().bits(0));
+                    tim.ccer.write(|w| w.cc3e().clear_bit());
+                    tim.ccmr2_output().write(|w| w.oc3m().pwm_mode1());
                     tim.ccr3.write(|w| w.ccr().bits(duty));
-                    tim.ccmr2_output()
-                        .write(|w| w.oc3pe().set_bit().oc3m().pwm_mode1());
-                    tim.cr1.write(|w| w.arpe().set_bit());
-                    self.enable();
+                    tim.ccmr2_output().write(|w| w.oc3pe().set_bit());
+                    tim.ccer.write(|w| w.cc3e().set_bit());
+                    tim.bdtr.write(|w| w.moe().set_bit());
                 }
             }
 
@@ -227,15 +218,12 @@ macro_rules! hal_advanced {
 
                 fn set_duty(&mut self, duty: Self::Duty) {
                     let tim = unsafe {&(*$TIMX::ptr())};
-                    self.disable();
-                    tim.cr1.write(|w| w.arpe().clear_bit());
-                    tim.ccmr2_output()
-                        .write(|w| w.oc4pe().clear_bit().oc4m().bits(0));
+                    tim.ccer.write(|w| w.cc4e().clear_bit());
+                    tim.ccmr2_output().write(|w| w.oc4m().pwm_mode1());
                     tim.ccr4.write(|w| w.ccr().bits(duty));
-                    tim.ccmr2_output()
-                        .write(|w| w.oc4pe().set_bit().oc4m().pwm_mode1());
-                    tim.cr1.write(|w| w.arpe().set_bit());
-                    self.enable();
+                    tim.ccmr2_output().write(|w| w.oc4pe().set_bit());
+                    tim.ccer.write(|w| w.cc4e().set_bit());
+                    tim.bdtr.write(|w| w.moe().set_bit());
                 }
             }
         )+
