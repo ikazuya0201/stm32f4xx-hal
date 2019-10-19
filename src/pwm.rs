@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 use core::mem;
 
 use crate::hal;
-use crate::stm32::TIM1;
+use crate::stm32::{RCC, TIM1};
 use cast::{u16, u32};
 
 use crate::gpio::gpioa::{PA10, PA11, PA8, PA9};
@@ -65,6 +65,9 @@ macro_rules! hal_advanced {
             ) -> PINS::Channels
             where PINS: Pins<$TIMX>,
             {
+                let rcc = unsafe { &(*RCC::ptr()) };
+                rcc.ahb1enr.write(|w| w.gpioaen().set_bit());
+
                 if PINS::C1 {
                     tim.ccmr1_output().write(|w| w.oc1pe().set_bit().oc1m().pwm_mode1());
                 }
