@@ -66,28 +66,24 @@ macro_rules! hal_advanced {
             where PINS: Pins<$TIMX>,
             {
                 let rcc = unsafe { &(*RCC::ptr()) };
-                rcc.ahb1enr.write(|w| w.gpioaen().set_bit());
+                rcc.ahb1enr.modify(|_, w| w.gpioaen().set_bit());
 
-                tim.cr1.write(|w| w.cen().clear_bit());
+                tim.cr1.modify(|_, w| w.cen().clear_bit());
 
                 if PINS::C1 {
-                    tim.ccmr1_output().write(|w| w.oc1pe().set_bit().oc1m().pwm_mode1());
-                    tim.ccr1.write(|w| w.ccr().bits(0));
+                    tim.ccmr1_output().modify(|_, w| w.oc1pe().set_bit().oc1m().pwm_mode1());
                 }
 
                 if PINS::C2 {
-                    tim.ccmr1_output().write(|w| w.oc2pe().set_bit().oc2m().pwm_mode1());
-                    tim.ccr2.write(|w| w.ccr().bits(0));
+                    tim.ccmr1_output().modify(|_, w| w.oc2pe().set_bit().oc2m().pwm_mode1());
                 }
 
                 if PINS::C3 {
-                    tim.ccmr2_output().write(|w| w.oc3pe().set_bit().oc3m().pwm_mode1());
-                    tim.ccr3.write(|w| w.ccr().bits(0));
+                    tim.ccmr2_output().modify(|_, w| w.oc3pe().set_bit().oc3m().pwm_mode1());
                 }
 
                 if PINS::C4 {
-                    tim.ccmr2_output().write(|w| w.oc4pe().set_bit().oc4m().pwm_mode1());
-                    tim.ccr4.write(|w| w.ccr().bits(0));
+                    tim.ccmr2_output().modify(|_, w| w.oc4pe().set_bit().oc4m().pwm_mode1());
                 }
 
                 let ticks = clk.0 / freq.0;
@@ -97,12 +93,12 @@ macro_rules! hal_advanced {
                 tim.arr.write(|w| w.arr().bits(arr));
 
                 tim.egr.write(|w| w.ug().set_bit());
-                tim.cr1.write(|w| w.arpe().set_bit());
+                tim.cr1.modify(|_, w| w.arpe().set_bit());
 
-                tim.bdtr.write(|w| w.ossr().clear_bit());
-                tim.bdtr.write(|w| w.moe().set_bit());
+                tim.bdtr.modify(|_, w| w.ossr().clear_bit());
+                tim.bdtr.modify(|_, w| w.moe().set_bit());
 
-                tim.cr1.write(|w| w.cen().set_bit());
+                tim.cr1.modify(|_, w| w.cen().set_bit());
 
                 unsafe{ mem::uninitialized() }
             }
@@ -111,11 +107,11 @@ macro_rules! hal_advanced {
                 type Duty = u16;
 
                 fn disable(&mut self) {
-                    unsafe{ &(*$TIMX::ptr())}.ccer.write(|w| w.cc1e().clear_bit());
+                    unsafe{ &(*$TIMX::ptr())}.ccer.modify(|_,w| w.cc1e().clear_bit());
                 }
 
                 fn enable(&mut self) {
-                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc1e().set_bit().cc1ne().clear_bit());
+                    unsafe {&(*$TIMX::ptr())}.ccer.modify(|_,w| w.cc1e().set_bit().cc1ne().clear_bit());
                 }
 
                 fn get_duty(&self) -> Self::Duty {
@@ -127,13 +123,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn set_duty(&mut self, duty: Self::Duty) {
-                    let tim = unsafe {&(*$TIMX::ptr())};
-                    tim.ccer.write(|w| w.cc1e().clear_bit());
-                    tim.ccmr1_output().write(|w| w.oc1m().pwm_mode1());
-                    tim.ccr1.write(|w| w.ccr().bits(duty));
-                    tim.ccmr1_output().write(|w| w.oc1pe().set_bit());
-                    tim.ccer.write(|w| w.cc1e().set_bit());
-                    tim.bdtr.write(|w| w.moe().set_bit());
+                    unsafe {&(*$TIMX::ptr()).ccr2.write(|w| w.ccr().bits(duty))};
                 }
             }
 
@@ -141,11 +131,11 @@ macro_rules! hal_advanced {
                 type Duty = u16;
 
                 fn disable(&mut self) {
-                    unsafe{ &(*$TIMX::ptr())}.ccer.write(|w| w.cc2e().clear_bit());
+                    unsafe{ &(*$TIMX::ptr())}.ccer.modify(|_,w| w.cc2e().clear_bit());
                 }
 
                 fn enable(&mut self) {
-                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc2e().set_bit().cc2ne().clear_bit());
+                    unsafe {&(*$TIMX::ptr())}.ccer.modify(|_,w| w.cc2e().set_bit().cc2ne().clear_bit());
                 }
 
                 fn get_duty(&self) -> Self::Duty {
@@ -157,13 +147,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn set_duty(&mut self, duty: Self::Duty) {
-                    let tim = unsafe {&(*$TIMX::ptr())};
-                    tim.ccer.write(|w| w.cc2e().clear_bit());
-                    tim.ccmr1_output().write(|w| w.oc2m().pwm_mode1());
-                    tim.ccr2.write(|w| w.ccr().bits(duty));
-                    tim.ccmr1_output().write(|w| w.oc2pe().set_bit());
-                    tim.ccer.write(|w| w.cc2e().set_bit());
-                    tim.bdtr.write(|w| w.moe().set_bit());
+                    unsafe {&(*$TIMX::ptr()).ccr2.write(|w| w.ccr().bits(duty))};
                 }
             }
 
@@ -171,11 +155,11 @@ macro_rules! hal_advanced {
                 type Duty = u16;
 
                 fn disable(&mut self) {
-                    unsafe{ &(*$TIMX::ptr())}.ccer.write(|w| w.cc3e().clear_bit());
+                    unsafe{ &(*$TIMX::ptr())}.ccer.modify(|_,w| w.cc3e().clear_bit());
                 }
 
                 fn enable(&mut self) {
-                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc3e().set_bit().cc3ne().clear_bit());
+                    unsafe {&(*$TIMX::ptr())}.ccer.modify(|_,w| w.cc3e().set_bit().cc3ne().clear_bit());
                 }
 
                 fn get_duty(&self) -> Self::Duty {
@@ -187,13 +171,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn set_duty(&mut self, duty: Self::Duty) {
-                    let tim = unsafe {&(*$TIMX::ptr())};
-                    tim.ccer.write(|w| w.cc3e().clear_bit());
-                    tim.ccmr2_output().write(|w| w.oc3m().pwm_mode1());
-                    tim.ccr3.write(|w| w.ccr().bits(duty));
-                    tim.ccmr2_output().write(|w| w.oc3pe().set_bit());
-                    tim.ccer.write(|w| w.cc3e().set_bit());
-                    tim.bdtr.write(|w| w.moe().set_bit());
+                    unsafe {&(*$TIMX::ptr()).ccr3.write(|w| w.ccr().bits(duty))};
                 }
             }
 
@@ -201,11 +179,11 @@ macro_rules! hal_advanced {
                 type Duty = u16;
 
                 fn disable(&mut self) {
-                    unsafe{ &(*$TIMX::ptr())}.ccer.write(|w| w.cc4e().clear_bit());
+                    unsafe{ &(*$TIMX::ptr())}.ccer.modify(|_, w| w.cc4e().clear_bit());
                 }
 
                 fn enable(&mut self) {
-                    unsafe {&(*$TIMX::ptr())}.ccer.write(|w| w.cc4e().set_bit());
+                    unsafe {&(*$TIMX::ptr())}.ccer.modify(|_, w| w.cc4e().set_bit());
                 }
 
                 fn get_duty(&self) -> Self::Duty {
@@ -217,13 +195,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn set_duty(&mut self, duty: Self::Duty) {
-                    let tim = unsafe {&(*$TIMX::ptr())};
-                    tim.ccer.write(|w| w.cc4e().clear_bit());
-                    tim.ccmr2_output().write(|w| w.oc4m().pwm_mode1());
-                    tim.ccr4.write(|w| w.ccr().bits(duty));
-                    tim.ccmr2_output().write(|w| w.oc4pe().set_bit());
-                    tim.ccer.write(|w| w.cc4e().set_bit());
-                    tim.bdtr.write(|w| w.moe().set_bit());
+                    unsafe {&(*$TIMX::ptr()).ccr4.write(|w| w.ccr().bits(duty))};
                 }
             }
         )+
