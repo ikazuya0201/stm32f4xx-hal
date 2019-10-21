@@ -60,12 +60,13 @@ macro_rules! hal_advanced {
             impl<PINS> Pwm<$TIMX, PINS>
                 where PINS: Pins<$TIMX>,
             {
-                pub fn $timX(
+                pub fn $timX<F>(
                     tim: $TIMX,
                     _pins: PINS,
-                    freq: Hertz,
+                    freq: F,
                     clocks: Clocks,
                 ) -> PINS::Channels
+                    where F: Into<Hertz>,
                 {
                     let rcc = unsafe { &(*RCC::ptr()) };
                     rcc.$apbenr.modify(|_, w| w.$timXen().set_bit());
@@ -90,7 +91,7 @@ macro_rules! hal_advanced {
                         tim.ccmr2_output().modify(|_, w| w.oc4pe().set_bit().oc4m().pwm_mode1());
                     }
 
-                    let ticks = clocks.$pclk().0 / freq.0;
+                    let ticks = clocks.$pclk().0 / freq.into().0;
                     let psc = u16(ticks / (1<<16)).unwrap();
                     tim.psc.write(|w| w.psc().bits(psc));
                     let arr = u16(ticks / u32(psc+1)).unwrap() - 1;
