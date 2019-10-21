@@ -88,8 +88,8 @@ use crate::time::Hertz;
 
 /// Hardware timers
 pub struct Timer<TIM> {
-    pub(crate) clocks: Clocks,
-    pub(crate) tim: TIM,
+    clocks: Clocks,
+    tim: TIM,
 }
 
 /// Interrupt events
@@ -157,17 +157,23 @@ macro_rules! hal {
         $(
             impl Timer<$TIM> {
                 /// Configures a TIM peripheral as a periodic count down timer
-                pub fn $tim(tim: $TIM, clocks: Clocks) -> Self {
+                pub fn $tim<T>(tim: $TIM, timeout: T, clocks: Clocks) -> Self
+                where
+                    T: Into<Hertz>,
+                {
                     // enable and reset peripheral to a clean slate state
                     let rcc = unsafe { &(*RCC::ptr()) };
                     rcc.$apbenr.modify(|_, w| w.$timXen().set_bit());
                     rcc.$apbrstr.modify(|_, w| w.$timXrst().set_bit());
                     rcc.$apbrstr.modify(|_, w| w.$timXrst().clear_bit());
 
-                    Self {
+                    let mut timer = Timer {
                         clocks,
                         tim,
-                    }
+                    };
+                    timer.start(timeout);
+
+                    timer
                 }
 
                 /// Starts listening for an `event`
