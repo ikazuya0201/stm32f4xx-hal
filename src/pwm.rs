@@ -129,7 +129,7 @@ macro_rules! hal_advanced {
                 }
 
                 fn set_duty(&mut self, duty: Self::Duty) {
-                    unsafe {&(*$TIMX::ptr()).ccr2.write(|w| w.ccr().bits(duty))};
+                    unsafe {&(*$TIMX::ptr()).ccr1.write(|w| w.ccr().bits(duty))};
                 }
             }
 
