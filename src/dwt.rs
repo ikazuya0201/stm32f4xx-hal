@@ -156,7 +156,7 @@ impl<'l> StopWatch<'l> {
     /// If lap count exceeds maximum, the last lap is updated
     pub fn lap(&mut self) -> &mut Self {
         let c = DWT::get_cycle_count();
-        if self.timei < self.times.len() {
+        if self.timei + 1 < self.times.len() {
             self.timei += 1;
         }
         self.times[self.timei] = c;
